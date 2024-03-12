@@ -11,6 +11,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Static resources
 app.get("/", (req, res) => {
   ifLoggedIn(req, res, () => {
     res.writeHead(200, { "content-type": "text/html" });
@@ -25,45 +26,36 @@ app.get("/css/pico.min.css", (req, res) => {
 
 // Currency Tracking
 app.post("/track-currency", (req, res) => {
-  ifLoggedIn(req, res, () => {
-    res.send({
-      currency: req.body.currency,
-      trackingStarted: dateFns.formatDistance(
-        dateFns.subMilliseconds(new Date(), 500),
-        new Date(),
-        {
-          addSuffix: true,
-        }
-      ),
-      priceThen: 200,
-      priceNow: 300,
-      change: 100,
-    });
+  ifLoggedIn(req, res, (token) => {
+    backend
+      .trackCurrency(token, req.body.currency)
+      .then((response) => response.json())
+      .then((record) => {
+        res.send(record);
+      })
+      .catch((error) => {
+        res.status(500).send(JSON.stringify(error));
+      });
   });
 });
+
 app.get("/my-tracked-currencies", (req, res) => {
-  ifLoggedIn(req, res, () => {
-    res.send([
-      {
-        currency: "bitcoin",
-        trackingStarted: dateFns.formatDistance(
-          dateFns.subDays(new Date(), 3),
-          new Date(),
-          {
-            addSuffix: true,
-          }
-        ),
-        priceThen: 200,
-        priceNow: 300,
-        change: 100,
-      },
-    ]);
+  ifLoggedIn(req, res, (token) => {
+    backend
+      .myTrackedCurrencies(token)
+      .then((response) => response.json())
+      .then((records) => {
+        res.send(records);
+      })
+      .catch((error) => {
+        res.status(500).send(JSON.stringify(error));
+      });
   });
 });
 
 // User Session Logic
 const ifLoggedIn = (req, res, func) =>
-  req.cookies["auth"] ? func() : res.redirect("/login");
+  req.cookies["auth"] ? func(req.cookies["auth"]) : res.redirect("/login");
 
 app.get("/login", (req, res) => {
   res.writeHead(200, { "content-type": "text/html" });
@@ -71,12 +63,23 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  if (!req.body.username || !req.body.password) {
-    res.redirect("/login?error=1");
-  } else {
-    res.cookie("auth", Buffer.from(req.body.username).toString("base64"));
-    res.redirect("/");
-  }
+  backend
+    .auth(req.body.username, req.body.password)
+    .then((response) => {
+      if (response.ok) {
+        const token = Buffer.from(
+          `${req.body.username}:${req.body.password}`
+        ).toString("base64");
+        res.cookie("auth", token);
+        res.redirect("/");
+      } else {
+        res.redirect("/login?error=1");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.redirect("/login?error=2");
+    });
 });
 
 app.post("/logout", (req, res) => {
@@ -85,5 +88,23 @@ app.post("/logout", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Frontend app listening on port ${port}`);
 });
+
+const callBackend = (path, data) =>
+  fetch(`http://localhost:3001${path}`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+
+const backend = {
+  auth: (username, password) => callBackend("/auth", { username, password }),
+  myTrackedCurrencies: (token) =>
+    callBackend("/my-tracked-currencies", { token }),
+  trackCurrency: (token, currency) =>
+    callBackend("/track-currency", { token, currency }),
+};

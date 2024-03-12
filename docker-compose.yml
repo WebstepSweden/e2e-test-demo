@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  database:
+    image: mongo:7.0.7-rc2-jammy
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - ./init-database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password

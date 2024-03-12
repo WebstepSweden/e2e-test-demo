@@ -6,21 +6,26 @@
   </head>
   <body>
     <main class="container">
-      <h1>Crypto Currency Price Tracker</h1>
-      <p>Use this amazing page to track crypto currency prices over time!</p>
+      <h1>&#129689; Crypto Currency Price Tracker</h1>
+      <p>
+        Use this amazing web application to track crypto currency prices over
+        time!
+      </p>
 
-      <h2>My Tracked Currencies</h2>
+      <article>
+        <h2>My Tracked Currencies</h2>
 
-      <table>
-        <thead>
-          <th>Currency</th>
-          <th>Tracking started</th>
-          <th>Price then (USD)</th>
-          <th>Price now (USD)</th>
-          <th>Change</th>
-        </thead>
-        <tbody id="my-tracked-currencies-table"></tbody>
-      </table>
+        <table>
+          <thead>
+            <th>Currency</th>
+            <th>Tracking started</th>
+            <th>Price then (USD)</th>
+            <th>Price now (USD)</th>
+            <th>Change</th>
+          </thead>
+          <tbody id="my-tracked-currencies-table"></tbody>
+        </table>
+      </article>
 
       <article id="loading" aria-busy="true"></article>
       <article
@@ -106,7 +111,13 @@
         showLoading();
         hideError();
         fetch("/my-tracked-currencies")
-          .then((response) => response.json())
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            }
+
+            return Promise.reject(response);
+          })
           .then((records) => {
             table.replaceChildren();
             records.forEach((record) => addToTable(record));
