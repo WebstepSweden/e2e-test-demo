@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="css/pico.min.css" />
+    <title>Frontend</title>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Crypto Currency Price Tracker</h1>
+      <p>Use this amazing page to track crypto currency prices over time!</p>
+
+      <h2>My Tracked Currencies</h2>
+
+      <table>
+        <thead>
+          <th>Currency</th>
+          <th>Tracking started</th>
+          <th>Price then (USD)</th>
+          <th>Price now (USD)</th>
+          <th>Change</th>
+        </thead>
+        <tbody id="my-tracked-currencies-table"></tbody>
+      </table>
+
+      <article id="loading" aria-busy="true"></article>
+      <article
+        id="error"
+        style="display: none; color: var(--pico-del-color)"
+      ></article>
+
+      <form id="add-currency-form">
+        <fieldset role="group">
+          <input
+            name="currency"
+            type="text"
+            placeholder="Enter the name of a currency you want to track"
+            autocomplete="off"
+            required
+          />
+          <button type="submit">Add</button>
+        </fieldset>
+      </form>
+
+      <form action="/logout" method="post">
+        <button class="outline secondary" type="submit">Log out</button>
+      </form>
+    </main>
+
+    <script>
+      const form = document.getElementById("add-currency-form");
+      const table = document.getElementById("my-tracked-currencies-table");
+      const loading = document.getElementById("loading");
+      const error = document.getElementById("error");
+
+      const showLoading = () => (loading.style.display = "block");
+      const hideLoading = () => (loading.style.display = "none");
+      const showError = (text) => {
+        error.style.display = "block";
+        let textNode = document.createTextNode(text);
+        error.replaceChildren(textNode);
+      };
+      const hideError = () => (error.style.display = "none");
+
+      const tableFields = [
+        "currency",
+        "trackingStarted",
+        "priceThen",
+        "priceNow",
+        "change",
+      ];
+
+      const addToTable = (record) => {
+        let newRow = table.insertRow(-1);
+
+        tableFields.forEach((field) => {
+          let text = document.createTextNode(record[field]);
+          let cell = newRow.insertCell();
+          cell.appendChild(text);
+        });
+      };
+
+      const trackNewCurrency = (formDataObject, onSuccess) => {
+        showLoading();
+        hideError();
+        fetch("/track-currency", {
+          method: "POST",
+          body: JSON.stringify(formDataObject),
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((record) => {
+            addToTable(record);
+            onSuccess();
+          })
+          .catch((error) => {
+            console.error(error);
+            showError("Something went wrong. Check console for details.");
+          })
+          .finally(() => hideLoading());
+      };
+
+      const loadMyTrackedCurrencies = () => {
+        showLoading();
+        hideError();
+        fetch("/my-tracked-currencies")
+          .then((response) => response.json())
+          .then((records) => {
+            table.replaceChildren();
+            records.forEach((record) => addToTable(record));
+          })
+          .catch((error) => {
+            console.error(error);
+            showError("Something went wrong. Check console for details.");
+          })
+          .finally(() => hideLoading());
+      };
+
+      const registerEventListeners = () => {
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+          const data = new FormData(event.target);
+          const dataObject = Object.fromEntries(data.entries());
+          trackNewCurrency(dataObject, () => {
+            event.target.reset();
+          });
+        });
+      };
+
+      registerEventListeners();
+      loadMyTrackedCurrencies();
+    </script>
+  </body>
+</html>
