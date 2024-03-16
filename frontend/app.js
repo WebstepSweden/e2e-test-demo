@@ -1,7 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const dateFns = require("date-fns");
-const port = 3000;
+const port = 3002;
 
 const app = express();
 const cookieParser = require("cookie-parser");
@@ -29,9 +29,17 @@ app.post("/track-currency", (req, res) => {
   ifLoggedIn(req, res, (token) => {
     backend
       .trackCurrency(token, req.body.currency)
-      .then((response) => response.json())
-      .then((record) => {
-        res.send(record);
+      .then((response) =>
+        response.json().then((json) => {
+          return { ok: response.ok, status: response.status, json: json };
+        })
+      )
+      .then(({ ok, status, json }) => {
+        if (!ok) {
+          res.status(status).send(json);
+        } else {
+          res.send(json);
+        }
       })
       .catch((error) => {
         res.status(500).send(JSON.stringify(error));
@@ -88,7 +96,7 @@ app.post("/logout", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Frontend app listening on port ${port}`);
+  console.info(`Frontend app listening on port ${port}`);
 });
 
 const callBackend = (path, data) =>

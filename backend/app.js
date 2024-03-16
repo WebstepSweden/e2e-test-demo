@@ -1,5 +1,6 @@
 const express = require("express");
 const database = require("./database");
+const coincap = require("./coincap");
 const port = 3001;
 
 const app = express();
@@ -12,7 +13,7 @@ app.post("/auth", (req, res) => {
       res.sendStatus(200);
     })
     .catch((err) => {
-      console.log("/auth", err);
+      console.warn("/auth", err);
       res.sendStatus(403);
     });
 });
@@ -25,7 +26,7 @@ app.post("/my-tracked-currencies", (req, res) =>
         res.send(records);
       })
       .catch((err) => {
-        console.log("/my-tracked-currencies", err);
+        console.warn("/my-tracked-currencies", err);
         res.sendStatus(500);
       });
   })
@@ -33,27 +34,33 @@ app.post("/my-tracked-currencies", (req, res) =>
 
 app.post("/track-currency", (req, res) =>
   withUser(req, res, (user) => {
-    var record = {
-      currency: req.body.currency,
-      trackingStarted: new Date(),
-      priceThen: 200,
-    };
+    coincap.getRate(req.body.currency).then((response) => {
+      if (!response.ok) {
+        res.status(400).send(response);
+        return Promise.resolve(false);
+      }
 
-    database
-      .saveTracking(user, record)
-      .then(() => {
-        console.log(record);
-        res.send({ ...record, priceNow: record.priceThen, change: 0 });
-      })
-      .catch((err) => {
-        console.log("/my-tracked-currencies", err);
-        res.sendStatus(500);
-      });
+      var record = {
+        currency: req.body.currency,
+        trackingStarted: new Date(),
+        priceThen: response.price,
+      };
+
+      database
+        .saveTracking(user, record)
+        .then(() => {
+          res.send({ ...record, priceNow: record.priceThen, change: 0 });
+        })
+        .catch((err) => {
+          console.warn("/my-tracked-currencies", err);
+          res.sendStatus(500);
+        });
+    });
   })
 );
 
 app.listen(port, () => {
-  console.log(`Backend app listening on port ${port}`);
+  console.info(`Backend app listening on port ${port}`);
 });
 
 const withUser = (req, res, func) => {

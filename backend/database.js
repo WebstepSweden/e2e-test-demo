@@ -2,6 +2,7 @@ var MongoClient = require("mongodb").MongoClient;
 
 const getUrl = (username, password) =>
   `mongodb://${username}:${password}@localhost:27017/currencyTracker`;
+
 module.exports = {
   userHasAccess: (username, password) =>
     new Promise((resolve, reject) => {
