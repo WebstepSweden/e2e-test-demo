@@ -14,17 +14,17 @@
 
       <article>
         <h2>My Tracked Currencies</h2>
-
         <table>
           <thead>
             <th>Currency</th>
             <th>Tracking started</th>
-            <th>Price then (USD)</th>
-            <th>Price now (USD)</th>
+            <th>Price then</th>
+            <th>Price now</th>
             <th>Change</th>
           </thead>
           <tbody id="my-tracked-currencies-table"></tbody>
         </table>
+        <i>*All prices are displayed in USD</i>
       </article>
 
       <article id="loading" aria-busy="true"></article>
@@ -97,8 +97,12 @@
         })
           .then((response) => response.json())
           .then((record) => {
-            addToTable(record);
-            onSuccess();
+            if (record.error) {
+              showError(record.error);
+            } else {
+              addToTable(record);
+              onSuccess();
+            }
           })
           .catch((error) => {
             console.error(error);

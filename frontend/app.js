@@ -38,7 +38,7 @@ app.post("/track-currency", (req, res) => {
         if (!ok) {
           res.status(status).send(json);
         } else {
-          res.send(json);
+          res.send(formatRecords([json])[0]);
         }
       })
       .catch((error) => {
@@ -53,7 +53,7 @@ app.get("/my-tracked-currencies", (req, res) => {
       .myTrackedCurrencies(token)
       .then((response) => response.json())
       .then((records) => {
-        res.send(records);
+        res.send(formatRecords(records));
       })
       .catch((error) => {
         res.status(500).send(JSON.stringify(error));
@@ -116,3 +116,15 @@ const backend = {
   trackCurrency: (token, currency) =>
     callBackend("/track-currency", { token, currency }),
 };
+
+const formatRecords = (records) =>
+  records.map((record) => {
+    return {
+      ...record,
+      trackingStarted: dateFns.formatDistance(
+        new Date(record.trackingStarted),
+        new Date(),
+        { addSuffix: true }
+      ),
+    };
+  });

@@ -23,7 +23,26 @@ app.post("/my-tracked-currencies", (req, res) =>
     database
       .myTrackedCurrencies(user)
       .then((records) => {
-        res.send(records);
+        const promises = records.map((record) => {
+          return coincap.getRate(record.currency).then((currencyResponse) => {
+            if (!currencyResponse.ok) {
+              return Promise.resolve(false);
+            }
+
+            return {
+              priceNow: currencyResponse.price,
+              change: (
+                parseFloat(currencyResponse.price) -
+                parseFloat(record.priceThen)
+              ).toString(),
+              ...record,
+            };
+          });
+        });
+
+        Promise.all(promises).then((withCurrentCurrencyData) => {
+          res.send(withCurrentCurrencyData);
+        });
       })
       .catch((err) => {
         console.warn("/my-tracked-currencies", err);
