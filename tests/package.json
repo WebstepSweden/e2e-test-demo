@@ -1,0 +1,12 @@
+{
+  "name": "api-mock",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "cypress open --config baseUrl=\"http://localhost:30002\""
+  },
+  "devDependencies": {
+    "cypress": "^13.7.1"
+  }
+}
