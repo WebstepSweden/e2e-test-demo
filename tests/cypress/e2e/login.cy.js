@@ -21,6 +21,8 @@ describe("Login feature", () => {
   });
 
   it("Valid user can log out", () => {
+    // Here we use the API to login instead of doing it using UI actions
+    // To avoid re-testing things covered by other tests
     cy.login();
     cy.visit("/");
     cy.get("button[type='submit'].secondary").click();
