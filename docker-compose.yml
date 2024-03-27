@@ -1,6 +1,7 @@
 version: "3.8"
 
 services:
+  # SYSTEM UNDER TEST
   frontend:
     build:
       context: .
@@ -22,8 +23,11 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      api-mock:
+        condition: service_started
     environment:
       DATABASE_URL: "database:27017"
+      COINCAP_URL: "http://api-mock:3003/coincap"
 
   database:
     image: mongo:7.0.7-rc2-jammy
@@ -41,3 +45,11 @@ services:
       timeout: 10s
       retries: 3
       start_period: 5s
+
+  # TEST ENVIRONMENT
+  api-mock:
+    build:
+      context: .
+      dockerfile: Dockerfile.api-mock
+    ports:
+      - 3003:3003

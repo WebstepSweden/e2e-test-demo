@@ -1,6 +1,7 @@
 const express = require("express");
 const database = require("./database");
 const coincap = require("./coincap");
+const { exists } = require("./database");
 const PORT = 3001;
 
 const app = express();
@@ -59,21 +60,35 @@ app.post("/track-currency", (req, res) =>
         return Promise.resolve(false);
       }
 
-      var record = {
+      var match = {
         currency: req.body.currency,
-        trackingStarted: new Date(),
-        priceThen: response.price,
+        username: user.username,
       };
 
-      database
-        .saveTracking(user, record)
-        .then(() => {
-          res.send({ ...record, priceNow: record.priceThen, change: 0 });
-        })
-        .catch((err) => {
-          console.warn("/my-tracked-currencies", err);
-          res.sendStatus(500);
-        });
+      database.exists(user, match).then((exists) => {
+        if (exists) {
+          res.status(400).send({
+            error: `Currency is already tracked: ${req.body.currency}`,
+          });
+          return;
+        }
+
+        var record = {
+          currency: req.body.currency,
+          trackingStarted: new Date(),
+          priceThen: response.price,
+        };
+
+        database
+          .saveTracking(user, record)
+          .then(() => {
+            res.send({ ...record, priceNow: record.priceThen, change: 0 });
+          })
+          .catch((err) => {
+            console.warn("/my-tracked-currencies", err);
+            res.sendStatus(500);
+          });
+      });
     });
   })
 );

@@ -23,6 +23,7 @@ module.exports = {
         };
       })
       .catch((error) => {
+        console.error("Error from Coincap API", error);
         return {
           ok: false,
           error: error,

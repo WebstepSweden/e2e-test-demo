@@ -81,4 +81,31 @@ module.exports = {
           });
       });
     }),
+
+  exists: ({ username, password }, match) =>
+    new Promise((resolve, reject) => {
+      let url = getUrl(username, password);
+      let mongoClient = new MongoClient(url);
+      mongoClient.connect().then((mongoClient) => {
+        let db = mongoClient.db("currencyTracker");
+        db.collection("tracked")
+          .findOne(match)
+          .then((found) => {
+            if (found) {
+              console.info("record already exists", found);
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          })
+          .catch((error) => {
+            console.error(
+              "error when checking if record exists",
+              username,
+              error
+            );
+            reject();
+          });
+      });
+    }),
 };
