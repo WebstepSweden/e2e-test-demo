@@ -1,7 +1,10 @@
 var MongoClient = require("mongodb").MongoClient;
 
+const HOST_AND_PORT = process.env.DATABASE_URL ?? "localhost:27017";
+console.info("Using database URL:", HOST_AND_PORT);
+
 const getUrl = (username, password) =>
-  `mongodb://${username}:${password}@localhost:27017/currencyTracker`;
+  `mongodb://${username}:${password}@${HOST_AND_PORT}/currencyTracker`;
 
 module.exports = {
   userHasAccess: (username, password) =>

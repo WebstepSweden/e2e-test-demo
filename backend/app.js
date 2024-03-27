@@ -1,7 +1,7 @@
 const express = require("express");
 const database = require("./database");
 const coincap = require("./coincap");
-const port = 3001;
+const PORT = 3001;
 
 const app = express();
 app.use(express.json());
@@ -78,8 +78,8 @@ app.post("/track-currency", (req, res) =>
   })
 );
 
-app.listen(port, () => {
-  console.info(`Backend app listening on port ${port}`);
+app.listen(PORT, () => {
+  console.info(`Backend app listening on port ${PORT}`);
 });
 
 const withUser = (req, res, func) => {

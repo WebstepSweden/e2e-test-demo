@@ -1,8 +1,9 @@
-const API_URL = "https://api.coincap.io";
+const COINCAP_URL = process.env.COINCAP_URL ?? "https://api.coincap.io";
+console.info("Using Coincap API Url:", COINCAP_URL);
 
 module.exports = {
   getRate: (currency) => {
-    const url = `${API_URL}/v2/assets/${currency}`;
+    const url = `${COINCAP_URL}/v2/assets/${currency}`;
     console.info("calling Coincap API", url);
 
     return fetch(url)

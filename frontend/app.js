@@ -1,11 +1,14 @@
 const express = require("express");
 const fs = require("fs");
 const dateFns = require("date-fns");
-const port = 3002;
 
 const app = express();
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+
+const PORT = 3002;
+const BACKEND_URL = process.env.BACKEND_URL ?? "localhost:3001";
+console.info("Using backend URL:", BACKEND_URL);
 
 app.use(cookieParser());
 app.use(express.json());
@@ -95,12 +98,12 @@ app.post("/logout", (req, res) => {
   res.redirect("/");
 });
 
-app.listen(port, () => {
-  console.info(`Frontend app listening on port ${port}`);
+app.listen(PORT, () => {
+  console.info(`Frontend app listening on port ${PORT}`);
 });
 
 const callBackend = (path, data) =>
-  fetch(`http://localhost:3001${path}`, {
+  fetch(`http://${BACKEND_URL}${path}`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: {

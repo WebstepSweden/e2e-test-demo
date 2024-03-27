@@ -1,6 +1,30 @@
 version: "3.8"
 
 services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - 3002:3002
+    depends_on:
+      backend:
+        condition: service_started
+    environment:
+      BACKEND_URL: "backend:3001"
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - 3001:3001
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "database:27017"
+
   database:
     image: mongo:7.0.7-rc2-jammy
     restart: always
@@ -16,4 +40,4 @@ services:
       interval: 10s
       timeout: 10s
       retries: 3
-      start_period: 20s
+      start_period: 5s
