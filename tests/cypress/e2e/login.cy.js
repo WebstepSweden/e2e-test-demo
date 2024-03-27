@@ -19,4 +19,11 @@ describe("Login feature", () => {
     cy.get("button").click();
     cy.url().should("include", "/login").and("include", "error=1");
   });
+
+  it("Valid user can log out", () => {
+    cy.login();
+    cy.visit("/");
+    cy.get("button[type='submit'].secondary").click();
+    cy.url().should("include", "/login");
+  });
 });
