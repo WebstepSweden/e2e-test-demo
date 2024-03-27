@@ -5,10 +5,10 @@
 In this repo you will find a simple crypto currency tracker application, consisting of 2 services. A frontend and a backend.
 
 ```mermaid
-graph TD;
-    Frontend-->Backend;
-    Backend-->Coinbase API;
-    Backend-->Mongo DB;
+flowchart TD
+    A[Frontend] --> B[Backend]
+    B[Backend] -->|gets prices from| D[Coinbase API]
+    B[Backend] -->|persists user's currencies| E[Mongo DB]
 ```
 
 The application lets you "track" the price of crypto currencies, by storing a list of the user's selected currencies and fetching the latest market prices from [Coinbase](https://www.coinbase.com/). The user can follow the price change since the currency was first "tracked".
@@ -26,9 +26,9 @@ The goal is to demonstrate how Docker, and Docker Compose, can assist in creatin
 The final test infrastructure looks like this
 
 ```mermaid
-graph TD;
-    Tests-->Frontend
-    Frontend-->Backend;
-    Backend-->Mocked Coinbase API;
-    Backend-->Mongo DB;
+flowchart TD
+    T[Tests] --> A[Frontend]
+    A[Frontend] --> B[Backend]
+    B[Backend] -->|gets prices from| D[Mocked Coinbase API]
+    B[Backend] -->|persists user's currencies| E[Mongo DB]
 ```
