@@ -49,6 +49,13 @@ services:
       start_period: 5s
 
   # TEST ENVIRONMENT
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    environment:
+      CYPRESS_BASE_URL: "http://frontend:3002"
+
   api-mock:
     build:
       context: .

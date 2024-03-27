@@ -1,0 +1,13 @@
+FROM cypress/base:20.11.1
+
+WORKDIR /tests
+
+COPY ./tests/package.json .
+
+RUN yarn install
+
+COPY ./tests/cypress.config.js .
+COPY ./tests/cypress ./cypress
+
+# Put container in idle state
+CMD tail -f /dev/null

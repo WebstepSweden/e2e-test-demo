@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "cypress open --config baseUrl=\"http://localhost:30002\""
+    "start": "cypress open --config baseUrl=\"http://localhost:30002\"",
+    "test": "cypress run --headless --config baseUrl=\"http://localhost:30002\""
   },
   "devDependencies": {
     "cypress": "^13.7.1"
