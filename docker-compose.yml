@@ -7,11 +7,12 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
     ports:
-      - 3002:3002
+      - 30002:3002
     depends_on:
       backend:
         condition: service_started
     environment:
+      PORT: 3002
       BACKEND_URL: "backend:3001"
 
   backend:
@@ -19,13 +20,14 @@ services:
       context: .
       dockerfile: Dockerfile.backend
     ports:
-      - 3001:3001
+      - 30001:3001
     depends_on:
       database:
         condition: service_healthy
       api-mock:
         condition: service_started
     environment:
+      PORT: 3001
       DATABASE_URL: "database:27017"
       COINCAP_URL: "http://api-mock:3003/coincap"
 
@@ -52,4 +54,6 @@ services:
       context: .
       dockerfile: Dockerfile.api-mock
     ports:
-      - 3003:3003
+      - 3003
+    environment:
+      PORT: 3003

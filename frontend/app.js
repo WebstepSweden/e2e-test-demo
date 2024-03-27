@@ -6,7 +6,7 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 
-const PORT = 3002;
+const PORT = process.env.PORT ?? 3002;
 const BACKEND_URL = process.env.BACKEND_URL ?? "localhost:3001";
 console.info("Using backend URL:", BACKEND_URL);
 

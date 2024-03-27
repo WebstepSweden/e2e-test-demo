@@ -1,6 +1,6 @@
 const express = require("express");
 const crypto = require("crypto");
-const PORT = 3003;
+const PORT = process.env.PORT ?? 3003;
 
 const app = express();
 app.use(express.json());
