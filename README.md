@@ -1,5 +1,11 @@
 # Example of E2E Tests with Docker Compose
 
+## How to Run
+
+- To start the services run `docker compose up` or `sh start-docker-environment.sh`. You can then access the frontent in your browser on `http://localhost:30002` and log in with username `testuser` and password `test123`.
+- To run the E2E test in Docker Compose run `sh run-tests-in-docker.sh`.
+- To run the tests locally with the test UI, run `cd tests && yarn start`.
+
 ## The Example Application
 
 In this repo you will find a simple crypto currency tracker application, consisting of 2 services. A frontend and a backend.
