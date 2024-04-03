@@ -1,0 +1,12 @@
+on: [push]
+jobs:
+  example-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start Docker Compose Environment
+        run: docker compose up
+      - name: Run Tests
+        run: docker compose exec -T tests yarn cypress run --headless
+      - name: Stop Docker Compose Environment
+        run: docker compose stop
+      
