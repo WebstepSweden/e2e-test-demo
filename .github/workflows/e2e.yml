@@ -3,6 +3,8 @@ jobs:
   run-e2e-tests:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
       - name: Debug
         run: ls
       - name: Start Docker Compose Environment
