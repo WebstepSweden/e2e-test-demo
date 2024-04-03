@@ -8,7 +8,7 @@ jobs:
       - name: Debug
         run: ls
       - name: Start Docker Compose Environment
-        run: docker compose up
+        run: docker compose up -d
       - name: Run Tests
         run: docker compose exec -T tests yarn cypress run --headless
       - name: Stop Docker Compose Environment
